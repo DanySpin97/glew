@@ -40,7 +40,7 @@ set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-find_package (OpenGL REQUIRED)
+find_package (OpenGL)
 
 # X11 required except for Windows and Apple OSX platforms
 if (NOT WIN32 AND NOT APPLE)
@@ -87,10 +87,13 @@ endif ()
 
 if (GLEW_EGL AND UNIX)
   add_definitions (-DGLEW_EGL)
-  if (OpenGL::EGL)
-    message (FATAL_ERROR "EGL library set but not found.")
+  find_package(PkgConfig REQUIRED)
+  pkg_check_modules(EGL egl)
+  if(NOT EGL_FOUND)
+     message(FATAL_ERROR "EGL library set but not found.")
   endif()
   set (GLEW_LIBRARIES ${OPENGL_LIBRARIES} ${OPENGL_egl_LIBRARY})
+  set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EGL_CFLAGS_OTHER}")
 endif ()
 
 #### GLEW ####
